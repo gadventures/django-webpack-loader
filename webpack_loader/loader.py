@@ -1,6 +1,6 @@
 import json
 import time
-from io import open
+from django.core.files.storage import default_storage
 
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -23,8 +23,10 @@ class WebpackLoader(object):
 
     def _load_assets(self):
         try:
-            with open(self.config['STATS_FILE'], encoding="utf-8") as f:
-                return json.load(f)
+            f = default_storage.open(self.config['STATS_FILE'])
+            data = f.read()
+            f.close()
+            return json.loads(data)
         except IOError:
             raise IOError(
                 'Error reading {0}. Are you sure webpack has generated '
